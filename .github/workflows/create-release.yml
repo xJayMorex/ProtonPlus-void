@@ -39,7 +39,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        arch: [x86_64]
+        arch: [x86_64, x86_64-musl]
     runs-on: self-hosted
     timeout-minutes: 720
     steps:
@@ -58,7 +58,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        arch: [x86_64]
+        arch: [x86_64, x86_64-musl]
     runs-on: self-hosted
     env:
       XBPS_TARGET_ARCH: ${{ matrix.arch }}
@@ -89,6 +89,7 @@ jobs:
             /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps
             /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.sig2
             /repository/binpkgs/x86_64-repodata
+            /repository/binpkgs/x86_64-musl-repodata
           tag_name: v${{ needs.Fetch.outputs.version }}
 
   Cleanup:

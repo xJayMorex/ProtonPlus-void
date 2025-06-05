@@ -26,6 +26,7 @@ ProtonPlus template and builds for Void Linux.
 Available builds:
 
 - x86_64
+- x86_64-musl
 
 ### Installing the binary package
 
