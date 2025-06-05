@@ -1,9 +1,9 @@
 # Template file for 'protonplus'
 pkgname=protonplus
 version=0.4.32
-revision=1
+revision=2
 build_style=meson
-archs="x86_64"
+archs="x86_64*"
 hostmakedepends="git gettext meson vala appstream-glib pkg-config"
 makedepends="libgee-devel gtk4-devel libadwaita-devel libarchive-devel libsoup3-devel desktop-file-utils"
 short_desc="ProtonPlus, a modern compatibility tools manager for Linux."
