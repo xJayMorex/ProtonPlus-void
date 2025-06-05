@@ -1,0 +1,103 @@
+name: Create release
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Fetch:
+    runs-on: self-hosted
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    environment:
+      name: release
+    steps:
+      - name: Fetch repository
+        uses: actions/checkout@v4
+        with:
+          path: master
+
+      - name: Fetch void-packages
+        uses: actions/checkout@v4
+        with:
+          repository: void-linux/void-packages
+          path: void-packages
+
+      - name: Configure void-packages
+        run: |
+          cp -r master/void-packages ./ 2>/dev/null
+
+      - id: version
+        run: |
+          echo "version=$( cat master/version )" >> $GITHUB_OUTPUT
+
+  Build:
+    needs: [Fetch]
+    strategy:
+      max-parallel: 1
+      matrix:
+        arch: [x86_64]
+    runs-on: self-hosted
+    timeout-minutes: 720
+    steps:
+      - name: Bootstrap ${{ matrix.arch }}
+        run: |
+          cd void-packages
+          ./xbps-src -H /repository -A ${{ matrix.arch }} binary-bootstrap
+          ./xbps-src -H /repository -A ${{ matrix.arch }} fetch protonplus
+      - name: Build ${{ matrix.arch }}
+        run: |
+          cd void-packages
+          ./xbps-src -H /repository -A ${{ matrix.arch }} -C pkg protonplus
+
+  Sign:
+    needs: [Fetch, Build]
+    strategy:
+      max-parallel: 1
+      matrix:
+        arch: [x86_64]
+    runs-on: self-hosted
+    env:
+      XBPS_TARGET_ARCH: ${{ matrix.arch }}
+    steps:
+      - name: Sign ${{ matrix.arch }} package
+        run: |
+          cd /repository/binpkgs
+          xbps-rindex -r $PWD
+          XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign --signedby "xJayMorex" --privkey /repository/xJayMorex.pem $PWD
+          XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign-pkg --privkey /repository/xJayMorex.pem $PWD/protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps
+          xbps-rindex -c $PWD
+          sha256sum protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps | tee -a ${{ github.workspace }}/void-packages/sum
+
+  Release:
+    needs: [Fetch, Sign]
+    runs-on: self-hosted
+    steps:
+      - name: Checksum check
+        run: |
+          cd /repository/binpkgs
+          cat ${{ github.workspace }}/void-packages/sum | sha256sum -c
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: ${{ github.workspace }}/void-packages/sum
+          files: |
+            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps
+            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.sig2
+            /repository/binpkgs/x86_64-repodata
+          tag_name: v${{ needs.Fetch.outputs.version }}
+
+  Cleanup:
+    needs: [Release]
+    runs-on: self-hosted
+    steps:
+      - name: Cleanup old release files
+        uses: dev-drprasad/delete-older-releases@v0.3.4
+        with:
+          keep_latest: 5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
