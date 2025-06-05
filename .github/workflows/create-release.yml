@@ -88,8 +88,8 @@ jobs:
           files: |
             /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps
             /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.sig2
-            /repository/binpkgs/*-repodata
-          tag_name: ${{ needs.Fetch.outputs.version }}
+            /repository/binpkgs/x86_64-repodata
+          tag_name: v${{ needs.Fetch.outputs.version }}
 
   Cleanup:
     needs: [Release]
