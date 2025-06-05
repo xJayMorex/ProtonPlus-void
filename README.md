@@ -26,7 +26,6 @@ ProtonPlus template and builds for Void Linux.
 Available builds:
 
 - x86_64
-- x86_64-musl
 
 ### Installing the binary package
 
@@ -45,7 +44,7 @@ Add the releases page as a repository:
 
 ```shell
 cat << EOF > /etc/xbps.d/30-protonplus.conf
-repository=https://github.com/xJayMorex/ProtonPlus-void/releases/latest/download/
+repository=https://github.com/xJayMorex/ProtonPlus-void/releases/latest/download
 EOF
 xbps-install -Su protonplus
 ```
