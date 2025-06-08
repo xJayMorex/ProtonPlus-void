@@ -40,8 +40,6 @@ jobs:
       max-parallel: 1
       matrix:
         arch: [x86_64, x86_64-musl]
-        exclude:
-          - arch: x86_64-musl
     runs-on: self-hosted
     timeout-minutes: 720
     steps:
@@ -61,8 +59,6 @@ jobs:
       max-parallel: 1
       matrix:
         arch: [x86_64, x86_64-musl]
-        exclude:
-          - arch: x86_64-musl
     runs-on: self-hosted
     env:
       XBPS_TARGET_ARCH: ${{ matrix.arch }}
@@ -76,33 +72,33 @@ jobs:
           xbps-rindex -c $PWD
           sha256sum protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps | tee -a ${{ github.workspace }}/void-packages/sum
 
-  Release:
-    needs: [Fetch, Sign]
-    runs-on: self-hosted
-    steps:
-      - name: Checksum check
-        run: |
-          cd /repository/binpkgs
-          cat ${{ github.workspace }}/void-packages/sum | sha256sum -c
+#  Release:
+#    needs: [Fetch, Sign]
+#    runs-on: self-hosted
+#    steps:
+#      - name: Checksum check
+#        run: |
+#          cd /repository/binpkgs
+#          cat ${{ github.workspace }}/void-packages/sum | sha256sum -c
+#
+#      - name: Publish
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          body_path: ${{ github.workspace }}/void-packages/sum
+#          files: |
+#            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps
+#            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.sig2
+#            /repository/binpkgs/x86_64-repodata
+#            /repository/binpkgs/x86_64-musl-repodata
+#          tag_name: v${{ needs.Fetch.outputs.version }}
 
-      - name: Publish
-        uses: softprops/action-gh-release@v2
-        with:
-          body_path: ${{ github.workspace }}/void-packages/sum
-          files: |
-            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps
-            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.sig2
-            /repository/binpkgs/x86_64-repodata
-            #/repository/binpkgs/x86_64-musl-repodata
-          tag_name: v${{ needs.Fetch.outputs.version }}
-
-  Cleanup:
-    needs: [Release]
-    runs-on: self-hosted
-    steps:
-      - name: Cleanup old release files
-        uses: dev-drprasad/delete-older-releases@v0.3.4
-        with:
-          keep_latest: 5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#  Cleanup:
+#    needs: [Release]
+#    runs-on: self-hosted
+#    steps:
+#      - name: Cleanup old release files
+#        uses: dev-drprasad/delete-older-releases@v0.3.4
+#        with:
+#          keep_latest: 5
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
