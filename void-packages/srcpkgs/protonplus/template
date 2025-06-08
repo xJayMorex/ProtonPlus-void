@@ -1,17 +1,17 @@
 # Template file for 'protonplus'
 pkgname=protonplus
-version=0.4.32
-revision=2
+version=0.5.1
+revision=1
 build_style=meson
 archs="x86_64*"
-hostmakedepends="git gettext meson vala appstream-glib pkg-config"
-makedepends="libgee-devel gtk4-devel libadwaita-devel libarchive-devel libsoup3-devel desktop-file-utils"
+hostmakedepends="git gettext meson vala appstream-glib pkg-config desktop-file-utils"
+makedepends="libgee-devel gtk4-devel libadwaita-devel libarchive-devel libsoup3-devel"
 short_desc="ProtonPlus, a modern compatibility tools manager for Linux."
 maintainer="xJayMorex <github@johntaylor.hu>"
 license="BSD-3-Clause"
 homepage="https://github.com/Vysp3r/protonplus"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum="293e6baa296c36e0442500f9efd573b112fc2403e77e748136a702340d6069a4"
+checksum="17ab9d592736f889667da4be4e9a82ddc9b301e9c92bc3c4db88f5715313bd52"
 
 post_install() {
 	vlicense LICENSE.md
