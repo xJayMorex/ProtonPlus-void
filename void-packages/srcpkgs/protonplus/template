@@ -1,7 +1,7 @@
 # Template file for 'protonplus'
 pkgname=protonplus
-version=0.4.32
-revision=2
+version=0.5.0-1
+revision=1
 build_style=meson
 archs="x86_64*"
 hostmakedepends="git gettext meson vala appstream-glib pkg-config"
@@ -11,7 +11,7 @@ maintainer="xJayMorex <github@johntaylor.hu>"
 license="BSD-3-Clause"
 homepage="https://github.com/Vysp3r/protonplus"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum="293e6baa296c36e0442500f9efd573b112fc2403e77e748136a702340d6069a4"
+checksum="57473238128cda8ab198f706b8162889d245b827829876cd0b18f5f34ad8fa2a"
 
 post_install() {
 	vlicense LICENSE.md
