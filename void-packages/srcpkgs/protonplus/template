@@ -1,6 +1,6 @@
 # Template file for 'protonplus'
 pkgname=protonplus
-version=0.5.1
+version=0.5.1+1
 revision=1
 build_style=meson
 archs="x86_64*"
@@ -10,8 +10,8 @@ short_desc="ProtonPlus, a modern compatibility tools manager for Linux."
 maintainer="xJayMorex <github@johntaylor.hu>"
 license="BSD-3-Clause"
 homepage="https://github.com/Vysp3r/protonplus"
-distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum="17ab9d592736f889667da4be4e9a82ddc9b301e9c92bc3c4db88f5715313bd52"
+distfiles="${homepage}/archive/refs/tags/v${version/+/-}.tar.gz"
+checksum="5edfb1f65dad2bcc06c675b44cfc5497afa83fd7f4c4f2804b6908931eabfa76"
 
 post_install() {
 	vlicense LICENSE.md
