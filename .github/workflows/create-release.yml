@@ -12,6 +12,7 @@ jobs:
     runs-on: self-hosted
     outputs:
       version: ${{ steps.version.outputs.version }}
+      base: ${{ steps.version.outputs.base }}
     environment:
       name: release
     steps:
@@ -33,6 +34,7 @@ jobs:
       - id: version
         run: |
           echo "version=$( cat master/version )" >> $GITHUB_OUTPUT
+          echo "base=$( cat master/base )" >> $GITHUB_OUTPUT
 
   Build:
     needs: [Fetch]
@@ -70,7 +72,7 @@ jobs:
           XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign --signedby "xJayMorex" --privkey /repository/xJayMorex.pem $PWD
           XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign-pkg --privkey /repository/xJayMorex.pem $PWD/protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps
           xbps-rindex -c $PWD
-          sha256sum protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps | tee -a ${{ github.workspace }}/void-packages/sum
+          sha256sum protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps > protonplus-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps.sha256sum
 
   Release:
     needs: [Fetch, Sign]
@@ -79,14 +81,15 @@ jobs:
       - name: Checksum check
         run: |
           cd /repository/binpkgs
-          cat ${{ github.workspace }}/void-packages/sum | sha256sum -c
+          cat protonplus-${{ needs.Fetch.outputs.version }}.*.xbps.sha256sum | sha256sum -c
 
       - name: Publish
         uses: softprops/action-gh-release@v2
         with:
-          body_path: ${{ github.workspace }}/void-packages/sum
+          body: "Upstream release: <a href='https://github.com/Vysp3r/ProtonPlus/releases/tag/${{ needs.Fetch.outputs.base }}'>${{ needs.Fetch.outputs.base }}</a>"
           files: |
             /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps
+            /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.xbps.sha256sum
             /repository/binpkgs/protonplus-${{ needs.Fetch.outputs.version }}.*.sig2
             /repository/binpkgs/x86_64-repodata
             /repository/binpkgs/x86_64-musl-repodata
