@@ -102,6 +102,6 @@ jobs:
       - name: Cleanup old release files
         uses: dev-drprasad/delete-older-releases@v0.3.4
         with:
-          keep_latest: 5
+          keep_latest: 15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
