@@ -45,7 +45,7 @@ jobs:
       matrix:
         arch: [x86_64, x86_64-musl]
     runs-on: self-hosted
-    timeout-minutes: 720
+    timeout-minutes: 10
     steps:
       - name: Bootstrap ${{ matrix.arch }}
         run: |
