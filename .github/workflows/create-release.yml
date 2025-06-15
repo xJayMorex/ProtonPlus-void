@@ -11,6 +11,7 @@ jobs:
   Fetch:
     runs-on: self-hosted
     outputs:
+      package: ${{ steps.version.outputs.package }}
       version: ${{ steps.version.outputs.version }}
       base: ${{ steps.version.outputs.base }}
     environment:
