@@ -38,7 +38,7 @@ jobs:
           echo "package=protonplus" >> $GITHUB_OUTPUT
           echo "version=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
           echo "revision=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'revision=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
-          echo "tag=v$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' | sed 's/+/-/' )" >> $GITHUB_OUTPUT
+          echo "tag=v$( echo $version | sed 's/+/-/' )" >> $GITHUB_OUTPUT
 
   Build:
     needs: [Fetch]
@@ -53,10 +53,10 @@ jobs:
         run: |
           cd void-packages
           ./xbps-src -H /repository -A ${{ matrix.arch }} binary-bootstrap
-          ./xbps-src -H /repository -A ${{ matrix.arch }} fetch ${{ needs.Fetch.outputs.package }}
       - name: Build ${{ matrix.arch }}
         run: |
           cd void-packages
+          ./xbps-src -H /repository -A ${{ matrix.arch }} fetch ${{ needs.Fetch.outputs.package }}
           ./xbps-src -H /repository -A ${{ matrix.arch }} -C pkg ${{ needs.Fetch.outputs.package }}
 
   Sign:
@@ -75,8 +75,10 @@ jobs:
           rm -f ${{ matrix.arch }}-repodata
           xbps-rindex --add $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps
           XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign --signedby "xJayMorex" --privkey /repository/xJayMorex.pem $PWD
-          XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign-pkg --privkey /repository/xJayMorex.pem $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps
-          sha256sum ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps > ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps.sha256sum
+          XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign-pkg --privkey /repository/xJayMorex.pem \
+            $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps
+          sha256sum ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps > \
+            ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps.sha256sum
 
   Release:
     needs: [Fetch, Sign]
