@@ -13,7 +13,7 @@ jobs:
     outputs:
       package: ${{ steps.version.outputs.package }}
       version: ${{ steps.version.outputs.version }}
-      base: ${{ steps.version.outputs.base }}
+      revision: ${{ steps.version.outputs.revision }}
     environment:
       name: release
     steps:
@@ -35,8 +35,8 @@ jobs:
       - id: version
         run: |
           echo "package=protonplus" >> $GITHUB_OUTPUT
-          echo "version=$( cat master/version )" >> $GITHUB_OUTPUT
-          echo "base=$( cat master/base )" >> $GITHUB_OUTPUT
+          echo "version=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
+          echo "revision=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'revision=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
 
   Build:
     needs: [Fetch]
@@ -71,10 +71,10 @@ jobs:
         run: |
           cd /repository/binpkgs
           rm -f ${{ matrix.arch }}-repodata
-          xbps-rindex --add $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps
+          xbps-rindex --add $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps
           XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign --signedby "xJayMorex" --privkey /repository/xJayMorex.pem $PWD
-          XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign-pkg --privkey /repository/xJayMorex.pem $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps
-          sha256sum ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps > ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.${{ matrix.arch }}.xbps.sha256sum
+          XBPS_PASSPHRASE=${{ secrets.SUPERBIA }} xbps-rindex --sign-pkg --privkey /repository/xJayMorex.pem $PWD/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps
+          sha256sum ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps > ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.${{ matrix.arch }}.xbps.sha256sum
 
   Release:
     needs: [Fetch, Sign]
@@ -83,19 +83,19 @@ jobs:
       - name: Checksum check
         run: |
           cd /repository/binpkgs
-          cat ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.*.xbps.sha256sum | sha256sum -c
+          cat ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.xbps.sha256sum | sha256sum -c
 
       - name: Publish
         uses: softprops/action-gh-release@v2
         with:
-          body: "Upstream release: <a href='https://github.com/Vysp3r/ProtonPlus/releases/tag/${{ needs.Fetch.outputs.base }}'>${{ needs.Fetch.outputs.base }}</a>"
+          body: "Upstream release: <a href='https://github.com/Vysp3r/ProtonPlus/releases/tag/v${{ needs.Fetch.outputs.version | sed 's/+/-/' }}'>v${{ needs.Fetch.outputs.version | sed 's/+/-/' }}</a>"
           files: |
-            /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.*.xbps
-            /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.*.xbps.sha256sum
-            /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}.*.sig2
+            /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.xbps
+            /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.xbps.sha256sum
+            /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.sig2
             /repository/binpkgs/x86_64-repodata
             /repository/binpkgs/x86_64-musl-repodata
-          tag_name: v${{ needs.Fetch.outputs.version }}
+          tag_name: "v${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}"
 
   Cleanup:
     needs: [Release]
