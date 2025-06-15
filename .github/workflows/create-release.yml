@@ -14,6 +14,7 @@ jobs:
       package: ${{ steps.version.outputs.package }}
       version: ${{ steps.version.outputs.version }}
       revision: ${{ steps.version.outputs.revision }}
+      tag: ${{ steps.version.outputs.tag }}
     environment:
       name: release
     steps:
@@ -37,6 +38,7 @@ jobs:
           echo "package=protonplus" >> $GITHUB_OUTPUT
           echo "version=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
           echo "revision=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'revision=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
+          echo "tag=v$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' | sed 's/+/-/)" >> $GITHUB_OUTPUT
 
   Build:
     needs: [Fetch]
@@ -88,7 +90,7 @@ jobs:
       - name: Publish
         uses: softprops/action-gh-release@v2
         with:
-          body: "Upstream release: <a href='https://github.com/Vysp3r/ProtonPlus/releases/tag/v${{ needs.Fetch.outputs.version | sed 's/+/-/' }}'>v${{ needs.Fetch.outputs.version | sed 's/+/-/' }}</a>"
+          body: "Upstream release: <a href='https://github.com/Vysp3r/ProtonPlus/releases/tag/${{ needs.Fetch.outputs.tag }}'>${{ needs.Fetch.outputs.tag }}</a>"
           files: |
             /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.xbps
             /repository/binpkgs/${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.xbps.sha256sum
