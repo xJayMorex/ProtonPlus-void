@@ -13,7 +13,7 @@ homepage="https://github.com/Vysp3r/protonplus"
 distfiles="${homepage}/archive/refs/tags/v${version/+/-}.tar.gz"
 checksum="57473238128cda8ab198f706b8162889d245b827829876cd0b18f5f34ad8fa2a"
 
-post_patch() {Add commentMore actions
+post_patch() {
 	if [ "$XBPS_TARGET_LIBC" = "musl" ]; then
 		for f in "${FILESDIR}"/musl-patches/*.patch; do
 			echo "Applying $f"
