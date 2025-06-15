@@ -52,7 +52,7 @@ jobs:
       - name: Bootstrap ${{ matrix.arch }}
         run: |
           cd void-packages
-          ./xbps-src -H /repository binary-bootstrap
+          ./xbps-src -H /repository -A ${{ matrix.arch }} binary-bootstrap
           ./xbps-src -H /repository -A ${{ matrix.arch }} fetch ${{ needs.Fetch.outputs.package }}
       - name: Build ${{ matrix.arch }}
         run: |
