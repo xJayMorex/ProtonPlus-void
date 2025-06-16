@@ -42,7 +42,7 @@ jobs:
           echo "package=protonplus" >> $GITHUB_OUTPUT
           echo "version=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
           echo "revision=$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'revision=' | awk -F '=' '{ print $2 }' )" >> $GITHUB_OUTPUT
-          echo "tag=v$( echo $version | sed 's/+/-/' )" >> $GITHUB_OUTPUT
+          echo "tag=v$( cat master/void-packages/srcpkgs/protonplus/template | grep -m 1 'version=' | awk -F '=' '{ print $2 }' | sed 's/+/-/' )" >> $GITHUB_OUTPUT
 
   Build:
     needs: [Fetch]
