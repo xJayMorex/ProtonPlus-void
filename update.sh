@@ -22,9 +22,9 @@ rm /tmp/v${2/+/-}.tar.gz
 sed -i "s/$OLD_PROTONPLUS_HASH/$PROTONPLUS_HASH/" void-packages/srcpkgs/protonplus/template
 
 git add -A
-git commit -q -m "${2/+/-}"
+git commit -q -m "v${2/+/-}"
 git push -q --set-upstream origin "v${2/+/-}"
 
-echo "Pushed ${2/+/-} to upstream"
+echo "Pushed v${2/+/-} to upstream"
 
 git checkout -q master
