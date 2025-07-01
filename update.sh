@@ -7,6 +7,8 @@ fi
 
 echo "Updating ProtonPlus Void from version ${1} to version ${2}..."
 
+git fetch -q
+git pull -q
 git checkout -q origin/master -b "v${2/+/-}" || { echo "Unable to create branch ${2}"; exit 2; }
 
 sed -i "s/version=${1/-/+}/version=${2/-/+}/" void-packages/srcpkgs/protonplus/template
