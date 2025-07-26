@@ -1,6 +1,6 @@
 # Template file for 'protonplus'
 pkgname=protonplus
-version=0.5.11
+version=0.5.12
 revision=1
 build_style=meson
 archs="x86_64*"
@@ -11,7 +11,7 @@ maintainer="xJayMorex <github@johntaylor.hu>"
 license="GPL-3.0-or-later"
 homepage="https://github.com/Vysp3r/protonplus"
 distfiles="${homepage}/archive/refs/tags/v${version/+/-}.tar.gz"
-checksum="b66266387925a8de74fbdd6a843cc51d703639a445ce910e2c3a19136bda5bec"
+checksum="c1af504fa797be6d127804257874be1850ddafab0d6f0fd06afc0eed68dd8675"
 
 post_install() {
 	vlicense LICENSE.md
