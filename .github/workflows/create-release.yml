@@ -12,7 +12,7 @@ on:
 
 jobs:
   Fetch:
-    if: ${{ github.event_name == 'workflow_dispatch' }} || github.event.pull_request.merged == true
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true }}
     runs-on: self-hosted
     outputs:
       package: ${{ steps.version.outputs.package }}
