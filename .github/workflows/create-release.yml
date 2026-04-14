@@ -94,7 +94,7 @@ jobs:
           cat ${{ needs.Fetch.outputs.package }}-${{ needs.Fetch.outputs.version }}_${{ needs.Fetch.outputs.revision }}.*.xbps.sha256sum | sha256sum -c
 
       - name: Publish
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body: "Upstream release: <a href='https://github.com/Vysp3r/ProtonPlus/releases/tag/${{ needs.Fetch.outputs.tag }}'>${{ needs.Fetch.outputs.tag }}</a>"
           files: |
