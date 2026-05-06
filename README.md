@@ -1,3 +1,12 @@
+# Deprecation notice
+ProtonPlus is now adopted by the [Official Void Linux package repository](//github.com/void-linux/void-packages), so there is no need to maintain this repo.
+
+To remove the custom repository:
+
+```shell
+rm /etc/xbps.d/30-protonplus.conf
+```
+
 # ProtonPlus for Void Linux  
 ProtonPlus template and builds for Void Linux.
 
